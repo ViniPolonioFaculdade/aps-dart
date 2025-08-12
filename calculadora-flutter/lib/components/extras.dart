@@ -9,8 +9,16 @@ class Extras extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color.fromARGB(255, 233, 233, 233),
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      decoration: const BoxDecoration(
+        color: Color.fromARGB(255, 245, 245, 245),
+        border: Border(
+          bottom: BorderSide(
+            color: Color.fromARGB(255, 220, 220, 220),
+            width: 1,
+          ),
+        ),
+      ),
+      padding: const EdgeInsets.fromLTRB(15, 15, 15, 15),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -73,6 +81,36 @@ class Extras extends StatelessWidget {
             TextoBotao(
               texto: 'tan',
               tamanho: 25,
+              pressionar: pressionar,
+            ),
+            TextoBotao(
+              texto: 'MC',
+              tamanho: 20,
+              pressionar: pressionar,
+            ),
+            TextoBotao(
+              texto: 'MR',
+              tamanho: 20,
+              pressionar: pressionar,
+            ),
+            TextoBotao(
+              texto: 'M+',
+              tamanho: 20,
+              pressionar: pressionar,
+            ),
+            TextoBotao(
+              texto: 'M-',
+              tamanho: 20,
+              pressionar: pressionar,
+            ),
+            TextoBotao(
+              texto: 'log',
+              tamanho: 20,
+              pressionar: pressionar,
+            ),
+            TextoBotao(
+              texto: 'ln',
+              tamanho: 20,
               pressionar: pressionar,
             ),
           ],

@@ -18,11 +18,22 @@ class Botao extends StatelessWidget {
       onPressed: () => pressionar(texto),
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all(Colors.white),
-        overlayColor: MaterialStateProperty.all(Colors.black38),
+        overlayColor: MaterialStateProperty.all(Colors.black26),
+        elevation: MaterialStateProperty.all(2),
+        shadowColor: MaterialStateProperty.all(Colors.black26),
+        shape: MaterialStateProperty.all(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
       ),
       child: Text(
         texto,
-        style: TextStyle(color: Colors.black54, fontSize: tamanho),
+        style: TextStyle(
+          color: Colors.black87,
+          fontSize: tamanho,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
@@ -45,11 +56,23 @@ class TextoBotao extends StatelessWidget {
     return TextButton(
       onPressed: () => pressionar(texto),
       style: ButtonStyle(
-        overlayColor: MaterialStateProperty.all(Colors.black38),
+        overlayColor: MaterialStateProperty.all(Colors.black26),
+        shape: MaterialStateProperty.all(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        padding: MaterialStateProperty.all(
+          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        ),
       ),
       child: Text(
         texto,
-        style: TextStyle(color: Colors.black54, fontSize: tamanho),
+        style: TextStyle(
+          color: Colors.black87,
+          fontSize: tamanho,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }

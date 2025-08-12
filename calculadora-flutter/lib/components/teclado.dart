@@ -11,19 +11,29 @@ class Teclado extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.count(
       primary: false,
-      crossAxisSpacing: 5,
-      mainAxisSpacing: 5,
+      crossAxisSpacing: 8,
+      mainAxisSpacing: 8,
       crossAxisCount: 4,
       shrinkWrap: true,
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(15),
       children: <Widget>[
         FilledButton(
             onPressed: () => pressionar('AC'),
             style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.red),
-                overlayColor: MaterialStateProperty.all(Colors.black38)),
+                backgroundColor: MaterialStateProperty.all(Colors.red.shade600),
+                overlayColor: MaterialStateProperty.all(Colors.black26),
+                elevation: MaterialStateProperty.all(2),
+                shadowColor: MaterialStateProperty.all(Colors.black26),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                )),
             child: const Text('AC',
-                style: TextStyle(color: Colors.white, fontSize: 30))),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold))),
         Botao(texto: '←', tamanho: 36, pressionar: pressionar),
         Botao(texto: '%', tamanho: 36, pressionar: pressionar),
         Botao(texto: '÷', tamanho: 36, pressionar: pressionar),
@@ -45,10 +55,20 @@ class Teclado extends StatelessWidget {
         FilledButton(
             onPressed: () => pressionar('='),
             style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.green),
-                overlayColor: MaterialStateProperty.all(Colors.black38)),
+                backgroundColor: MaterialStateProperty.all(Colors.green.shade600),
+                overlayColor: MaterialStateProperty.all(Colors.black26),
+                elevation: MaterialStateProperty.all(2),
+                shadowColor: MaterialStateProperty.all(Colors.black26),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                )),
             child: const Text('=',
-                style: TextStyle(color: Colors.white, fontSize: 46))),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 46,
+                    fontWeight: FontWeight.bold))),
       ],
     );
   }

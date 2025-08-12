@@ -8,7 +8,7 @@ class Expressao {
   List ordem = [];
   var resultado;
 
-  static double rad = 180 / 3.14;
+  static double rad = 180 / pi;
   static List<Map<String, String>> regras_ordem = [
     {
       'inicio': '(',
@@ -42,6 +42,18 @@ class Expressao {
       double result = 0;
       result =
           arrendondar(tan(grausToRadiano(double.parse(formula[index + 1]))), 2);
+      formula.removeAt(index + 1);
+      formula[index] = result.toString();
+    },
+    'log': (int index, List formula) {
+      double result = 0;
+      result = arrendondar(log(double.parse(formula[index + 1])) / ln10, 2);
+      formula.removeAt(index + 1);
+      formula[index] = result.toString();
+    },
+    'ln': (int index, List formula) {
+      double result = 0;
+      result = arrendondar(log(double.parse(formula[index + 1])), 2);
       formula.removeAt(index + 1);
       formula[index] = result.toString();
     },
@@ -108,7 +120,7 @@ class Expressao {
     bool unirNum = false;
     bool unirLetras = false;
     Set num = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'};
-    Set letras = {'s', 'i', 'n', 'c', 'o', 't', 'a'};
+    Set letras = {'s', 'i', 'n', 'c', 'o', 't', 'a', 'l', 'g'};
     for (int i = 0; i < valor.length; i++) {
       if (valor[i] == ' ') {
       } else if (num.contains(valor[i])) {
@@ -145,17 +157,12 @@ class Expressao {
   }
 
   static double arrendondar(double valor, int casas) {
-    num fator = pow(10, casas);
-    double result = (valor * fator).toInt().toDouble();
-    String pont = result.toInt().toString();
-    int ultimo = int.parse(pont[pont.length - 1]);
-    int diferenca = 10 - ultimo;
-    if (diferenca <= 5) {
-      result = (diferenca + result) / fator;
-    } else {
-      result = (result - ultimo) / fator;
+    if (valor.isNaN || valor.isInfinite) {
+      return valor;
     }
-    return result;
+    
+    num fator = pow(10, casas);
+    return (valor * fator).round() / fator;
   }
 
   calcularFormula({required List formula}) {

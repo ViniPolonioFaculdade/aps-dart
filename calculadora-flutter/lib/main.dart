@@ -24,15 +24,20 @@ class Pagina extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Calculadora de Ismael',
+        title: const Text(
+          'Calculadora Científica',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
-        backgroundColor: Color.fromARGB(255, 0, 167, 28),
-        shadowColor: Color.fromARGB(0, 0, 0, 0),
+        backgroundColor: const Color.fromARGB(255, 0, 167, 28),
+        shadowColor: Colors.black26,
+        elevation: 4,
         centerTitle: true,
       ),
       body: Visor(),
-      backgroundColor: Color.fromARGB(255, 230, 230, 230),
+      backgroundColor: const Color.fromARGB(255, 240, 240, 240),
     );
   }
 }
