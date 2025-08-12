@@ -75,6 +75,36 @@ class Extras extends StatelessWidget {
               tamanho: 25,
               pressionar: pressionar,
             ),
+            TextoBotao(
+              texto: 'log',
+              tamanho: 25,
+              pressionar: pressionar,
+            ),
+            TextoBotao(
+              texto: 'ln',
+              tamanho: 25,
+              pressionar: pressionar,
+            ),
+            TextoBotao(
+              texto: 'sqrt',
+              tamanho: 25,
+              pressionar: pressionar,
+            ),
+            TextoBotao(
+              texto: 'abs',
+              tamanho: 25,
+              pressionar: pressionar,
+            ),
+            TextoBotao(
+              texto: 'pi',
+              tamanho: 25,
+              pressionar: pressionar,
+            ),
+            TextoBotao(
+              texto: 'e',
+              tamanho: 25,
+              pressionar: pressionar,
+            ),
           ],
         ),
       ),

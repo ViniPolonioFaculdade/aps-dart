@@ -54,7 +54,7 @@ class Expressao {
   List ordem = [];
   var resultado;
 
-  static double rad = 180 / 3.14;
+  static double rad = pi / 180;
   static List<Map<String, String>> regras_ordem = [
     {
       'inicio': '(',
@@ -73,23 +73,62 @@ class Expressao {
     'sin': (int index, List formula) {
       double result = 0;
       result =
-          arrendondar(sin(grausToRadiano(double.parse(formula[index + 1]))), 2);
+          arrendondar(sin(grausToRadiano(double.parse(formula[index + 1]))), 10);
       formula.removeAt(index + 1);
       formula[index] = result.toString();
     },
     'cos': (int index, List formula) {
       double result = 0;
       result =
-          arrendondar(cos(grausToRadiano(double.parse(formula[index + 1]))), 2);
+          arrendondar(cos(grausToRadiano(double.parse(formula[index + 1]))), 10);
       formula.removeAt(index + 1);
       formula[index] = result.toString();
     },
     'tan': (int index, List formula) {
       double result = 0;
       result =
-          arrendondar(tan(grausToRadiano(double.parse(formula[index + 1]))), 2);
+          arrendondar(tan(grausToRadiano(double.parse(formula[index + 1]))), 10);
       formula.removeAt(index + 1);
       formula[index] = result.toString();
+    },
+    'log': (int index, List formula) {
+      double value = double.parse(formula[index + 1]);
+      if (value <= 0) {
+        throw ArgumentError('Logarithm is only defined for positive numbers');
+      }
+      double result = arrendondar(log(value) / ln10, 10);
+      formula.removeAt(index + 1);
+      formula[index] = result.toString();
+    },
+    'ln': (int index, List formula) {
+      double value = double.parse(formula[index + 1]);
+      if (value <= 0) {
+        throw ArgumentError('Natural logarithm is only defined for positive numbers');
+      }
+      double result = arrendondar(log(value), 10);
+      formula.removeAt(index + 1);
+      formula[index] = result.toString();
+    },
+    'sqrt': (int index, List formula) {
+      double value = double.parse(formula[index + 1]);
+      if (value < 0) {
+        throw ArgumentError('Square root is only defined for non-negative numbers');
+      }
+      double result = arrendondar(sqrt(value), 10);
+      formula.removeAt(index + 1);
+      formula[index] = result.toString();
+    },
+    'abs': (int index, List formula) {
+      double value = double.parse(formula[index + 1]);
+      double result = value.abs();
+      formula.removeAt(index + 1);
+      formula[index] = result.toString();
+    },
+    'pi': (int index, List formula) {
+      formula[index] = pi.toString();
+    },
+    'e': (int index, List formula) {
+      formula[index] = e.toString();
     },
     '^': (int index, List formula) {
       num result = 0.0;
@@ -114,9 +153,12 @@ class Expressao {
       formula[index - 1] = result.toString();
     },
     '÷': (int index, List formula) {
+      double divisor = double.parse(formula[index + 1]);
+      if (divisor == 0) {
+        throw ArgumentError('Division by zero is not allowed');
+      }
       double result = 0;
-      result =
-          double.parse(formula[index - 1]) / double.parse(formula[index + 1]);
+      result = double.parse(formula[index - 1]) / divisor;
       formula.removeAt(index + 1);
       formula.removeAt(index);
       formula[index - 1] = result.toString();
@@ -156,13 +198,43 @@ class Expressao {
   }
 
   static List stringToList({required String valor}) {
+    if (valor.trim().isEmpty) {
+      throw ArgumentError('Expression cannot be empty');
+    }
+    
+    // Check for double operators
+    List<String> operators = ['+', '-', '×', '÷', '^'];
+    for (int i = 0; i < valor.length - 1; i++) {
+      if (operators.contains(valor[i]) && operators.contains(valor[i + 1])) {
+        // Allow +/- after operators for negative numbers
+        if (!((valor[i] == '+' || valor[i] == '-' || valor[i] == '×' || valor[i] == '÷' || valor[i] == '^') && 
+              (valor[i + 1] == '+' || valor[i + 1] == '-'))) {
+          throw ArgumentError('Invalid expression: consecutive operators "${valor[i]}${valor[i + 1]}"');
+        }
+      }
+    }
+    
+    // Check for double dots
+    if (valor.contains('..')) {
+      throw ArgumentError('Invalid expression: double dots are not allowed');
+    }
+    
+    // Check for double circumflex
+    if (valor.contains('^^')) {
+      throw ArgumentError('Invalid expression: double circumflex are not allowed');
+    }
+    
     List resultado = [];
     bool unirNum = false;
     bool unirLetras = false;
     Set num = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'};
-    Set letras = {'s', 'i', 'n', 'c', 'o', 't', 'a'};
+    Set letras = {'s', 'i', 'n', 'c', 'o', 't', 'a', 'l', 'g', 'q', 'r', 'b', 'p', 'e'};
+    
     for (int i = 0; i < valor.length; i++) {
       if (valor[i] == ' ') {
+        // Skip spaces but reset combination flags
+        unirNum = false;
+        unirLetras = false;
       } else if (num.contains(valor[i])) {
         if (unirNum) {
           if (resultado.length == 0) resultado.add('');
@@ -171,6 +243,7 @@ class Expressao {
           resultado.add(valor[i]);
         }
         unirNum = true;
+        unirLetras = false;
       } else if (letras.contains(valor[i])) {
         if (unirLetras) {
           if (resultado.length == 0) resultado.add('');
@@ -179,86 +252,151 @@ class Expressao {
           resultado.add(valor[i]);
         }
         unirLetras = true;
+        unirNum = false;
       } else {
         resultado.add(valor[i]);
         unirNum = false;
         unirLetras = false;
       }
     }
+    
+    // Validate bracket matching
+    _validateBrackets(resultado);
+    
     return resultado;
+  }
+  
+  static void _validateBrackets(List tokens) {
+    List<String> stack = [];
+    Map<String, String> bracketPairs = {'(': ')', '[': ']', '{': '}'};
+    
+    for (var token in tokens) {
+      if (bracketPairs.containsKey(token)) {
+        stack.add(token);
+      } else if (bracketPairs.containsValue(token)) {
+        if (stack.isEmpty) {
+          throw ArgumentError('Mismatched closing bracket: $token');
+        }
+        String lastOpening = stack.removeLast();
+        if (bracketPairs[lastOpening] != token) {
+          throw ArgumentError('Mismatched bracket types: $lastOpening and $token');
+        }
+      }
+    }
+    
+    if (stack.isNotEmpty) {
+      throw ArgumentError('Unmatched opening brackets: ${stack.join(", ")}');
+    }
   }
 
   static double radianoToGraus(double valor) {
-    return valor * rad;
-  }
-
-  static double grausToRadiano(double valor) {
     return valor / rad;
   }
 
+  static double grausToRadiano(double valor) {
+    return valor * rad;
+  }
+
   static double arrendondar(double valor, int casas) {
-    num fator = pow(10, casas);
-    double result = (valor * fator).toInt().toDouble();
-    String pont = result.toInt().toString();
-    int ultimo = int.parse(pont[pont.length - 1]);
-    int diferenca = 10 - ultimo;
-    if (diferenca <= 5) {
-      result = (diferenca + result) / fator;
-    } else {
-      result = (result - ultimo) / fator;
+    if (casas < 0) {
+      throw ArgumentError('Number of decimal places must be non-negative');
     }
-    return result;
+    num fator = pow(10, casas);
+    return (valor * fator).round() / fator;
   }
 
   calcularFormula({required List formula}) {
+    if (formula.isEmpty) {
+      throw ArgumentError('Formula cannot be empty');
+    }
+    
+    // Create a copy to avoid modifying the original
+    List formulaCopy = List.from(formula);
+    
     for (String op in regras_operadores.keys) {
       int i = 0;
-      int tamanho = formula.length;
+      int tamanho = formulaCopy.length;
       while (true) {
         if (i >= tamanho) break;
-        if (formula[i] == op) {
-          regras_operadores[op]!(i, formula);
-          i = 0;
-          tamanho = formula.length;
+        if (formulaCopy[i] == op) {
+          try {
+            regras_operadores[op]!(i, formulaCopy);
+            i = 0;
+            tamanho = formulaCopy.length;
+          } catch (e) {
+            throw ArgumentError('Error processing operator "$op" at position $i: $e');
+          }
         }
         i++;
       }
     }
-    return formula.last;
+    
+    if (formulaCopy.isEmpty) {
+      throw ArgumentError('Calculation resulted in empty formula');
+    }
+    
+    return formulaCopy.last;
   }
 
   segmentar({required List exp}) {
-    bool agrupar = false;
-
-    List parte = [];
-    List aux = exp;
-    List total = exp;
-    for (var o in regras_ordem) {
-      aux = total;
-      total = [];
-      for (var e in aux) {
-        if (o['inicio'] == e) {
-          agrupar = true;
-        } else if (o['fim'] == e) {
-          agrupar = false;
-          total.add(calcularFormula(formula: parte));
-          parte = [];
-        } else {
-          if (agrupar) {
-            parte.add(e);
-          } else {
-            total.add(e);
+    List<List> stack = [];
+    List current = [];
+    
+    for (var element in exp) {
+      bool isOpeningBracket = false;
+      bool isClosingBracket = false;
+      
+      // Check for opening brackets
+      for (var rule in regras_ordem) {
+        if (element == rule['inicio']) {
+          stack.add(current);
+          current = [];
+          isOpeningBracket = true;
+          break;
+        }
+      }
+      
+      if (!isOpeningBracket) {
+        // Check for closing brackets
+        for (var rule in regras_ordem) {
+          if (element == rule['fim']) {
+            // Calculate the current bracket content
+            var result = calcularFormula(formula: current);
+            // Restore previous level
+            if (stack.isNotEmpty) {
+              current = stack.removeLast();
+              current.add(result);
+            } else {
+              current = [result];
+            }
+            isClosingBracket = true;
+            break;
           }
+        }
+        
+        if (!isClosingBracket) {
+          current.add(element);
         }
       }
     }
-    return calcularFormula(formula: total);
+    
+    // If there are unmatched opening brackets
+    if (stack.isNotEmpty) {
+      throw ArgumentError('Mismatched opening brackets');
+    }
+    
+    return calcularFormula(formula: current);
   }
 
   @override
   String toString() {
-    this.ordem = stringToList(valor: this.dado);
-    this.resultado = segmentar(exp: ordem);
-    return this.resultado.toString();
+    try {
+      this.ordem = stringToList(valor: this.dado);
+      this.resultado = segmentar(exp: ordem);
+      return this.resultado.toString();
+    } catch (e) {
+      // Re-throw with more context
+      throw ArgumentError('Error evaluating expression "${this.dado}": $e');
+    }
   }
 }
