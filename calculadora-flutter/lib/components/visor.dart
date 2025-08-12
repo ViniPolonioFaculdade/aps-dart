@@ -37,6 +37,48 @@ class _VisorState extends State<Visor> {
         case '+/-':
           texto += '×(-1)×';
           break;
+        case 'sqrt':
+          if (texto == '0') {
+            texto = 'sqrt(';
+          } else {
+            texto += 'sqrt(';
+          }
+          break;
+        case 'log':
+          if (texto == '0') {
+            texto = 'log(';
+          } else {
+            texto += 'log(';
+          }
+          break;
+        case 'ln':
+          if (texto == '0') {
+            texto = 'ln(';
+          } else {
+            texto += 'ln(';
+          }
+          break;
+        case 'abs':
+          if (texto == '0') {
+            texto = 'abs(';
+          } else {
+            texto += 'abs(';
+          }
+          break;
+        case 'pi':
+          if (texto == '0') {
+            texto = 'pi';
+          } else {
+            texto += 'pi';
+          }
+          break;
+        case 'e':
+          if (texto == '0') {
+            texto = 'e';
+          } else {
+            texto += 'e';
+          }
+          break;
         case 'sin':
           if (texto == '0') {
             texto = 'sin(';
